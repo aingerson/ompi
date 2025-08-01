@@ -57,7 +57,9 @@ ompi_mtl_ofi_reg_mem(void *reg_data, void *base, size_t size,
     }
 #endif
 
-    ret = fi_mr_regattr(ompi_mtl_ofi.domain, &attr, 0, &mtl_reg->ofi_mr);
+    ret = fi_mr_regattr(ompi_mtl_ofi.domain, &attr,
+                        flags & MCA_ACCELERATOR_FLAGS_UNIFIED_MEMORY ? 0 :
+                        FI_HMEM_DEVICE_ONLY, &mtl_reg->ofi_mr);
     if (0 != ret) {
         opal_show_help("help-mtl-ofi.txt", "Buffer Memory Registration Failed", true,
                        opal_accelerator_base_selected_component.base_version.mca_component_name,
