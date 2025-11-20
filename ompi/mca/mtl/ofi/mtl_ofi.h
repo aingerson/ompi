@@ -292,6 +292,9 @@ static
 int ompi_mtl_ofi_register_buffer(struct opal_convertor_t *convertor,
                                  ompi_mtl_ofi_request_t *ofi_req,
                                  void* buffer) {
+    int dev_id;
+    uint64_t flags;
+
     ofi_req->mr = NULL;
     if (ofi_req->length <= 0 || NULL == buffer) {
         return OMPI_SUCCESS;
@@ -325,9 +328,11 @@ int ompi_mtl_ofi_register_buffer(struct opal_convertor_t *convertor,
         } else {
             return OPAL_ERROR;
         }
+        opal_accelerator.check_addr(buffer, &dev_id, &flags);
 reg:
-        ret = fi_mr_regattr(ompi_mtl_ofi.domain, &attr, 0, &ofi_req->mr);
-
+        ret = fi_mr_regattr(ompi_mtl_ofi.domain, &attr,
+                    flags & MCA_ACCELERATOR_FLAGS_UNIFIED_MEMORY ?
+                    0 : FI_HMEM_DEVICE_ONLY, &ofi_req->mr);
         if (ret) {
             opal_show_help("help-mtl-ofi.txt", "Buffer Memory Registration Failed", true,
                            opal_accelerator_base_selected_component.base_version.mca_component_name,
