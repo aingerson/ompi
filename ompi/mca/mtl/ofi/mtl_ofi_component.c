@@ -745,6 +745,7 @@ no_hmem:
         }
     }
 
+    hints->caps &= ~FI_REMOTE_COMM;
     /**
      * fi_getinfo:  returns information about fabric  services for reaching a
      * remote node or service.  this does not necessarily allocate resources.
